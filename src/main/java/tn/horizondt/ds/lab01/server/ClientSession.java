@@ -15,32 +15,33 @@ public class ClientSession implements Runnable {
 
     private final Socket socket;
     private final ServerState state;
-    private final CommandRouter router;
+   // private final CommandRouter router;
     private final ClientSessionContext sessionContext = new ClientSessionContext();
 
-    public ClientSession(Socket socket, ServerState state, CommandRouter router) {
+    /*public ClientSession(Socket socket, ServerState state, CommandRouter router) {
         this.socket = socket;
         this.state = state;
         this.router = router;
+    }*/
+
+    public ClientSession(Socket client, ServerState state) {
+        this.socket = client;
+        this.state = state;
     }
 
     @Override
     public void run() {
-        // TODO (Part 6): Add socket timeouts to avoid hanging connections:
-        // socket.setSoTimeout(60_000);
 
-        try (
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-                BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))
-        ) {
-            // TODO (Part 1): For warm-up, you may temporarily implement only PING->PONG here.
-            // Then move logic to router in Part 2.
+        BufferedReader in = null;
+        BufferedWriter out=null;
+        String line;
+        try {
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+            out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
 
-            String line;
             while ((line = in.readLine()) != null) {
-                //String response = router.handle(line, sessionContext, state);
 
-                //out.write(response);
+
                 out.write("\n");
                 out.flush();
 
@@ -49,14 +50,9 @@ public class ClientSession implements Runnable {
                 if (sessionContext.shouldClose()) {
                     break;
                 }
-            }
-        } catch (SocketTimeoutException e) {
-            // TODO (Part 6): Decide behavior on timeout (send ERR TIMEOUT then close).
-            // Note: sending requires output stream, so you might handle it inside loop.
-        } catch (IOException e) {
-            // Client disconnected or IO problem. Don't crash the server.
-        } finally {
-            try { socket.close(); } catch (IOException ignored) {}
+
+        }} catch (Exception e) {
+            throw new RuntimeException(e);
         }
-    }
+        }
 }

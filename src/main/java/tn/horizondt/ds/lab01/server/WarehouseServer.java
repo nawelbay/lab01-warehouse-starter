@@ -36,7 +36,7 @@ public class WarehouseServer {
         OrderService orderService = new OrderService(new HashMap<>());
         ServerState state = new ServerState(inventoryService, orderService);
 
-        CommandRouter router = new CommandRouter();
+
 
         // TODO (Part 5): Replace thread-per-connection with a fixed thread pool.
         // Example:
@@ -47,32 +47,20 @@ public class WarehouseServer {
         // - close server socket
         // - shutdown thread pool
         // - stop accept loop
-
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
+        try {
+        ServerSocket serverSocket =new ServerSocket(port);
             System.out.println("WarehouseServer listening on port " + port);
+            Socket client = serverSocket.accept();
+            System.out.println("Client connected: " + client.getRemoteSocketAddress());
 
-            // TODO (Part 1): Warm-up mode: accept a single client and handle just PING->PONG.
-            // TODO (Part 3): Production mode: loop forever accepting clients.
-            while (true) {
-                Socket client = serverSocket.accept();
-                System.out.println("Client connected: " + client.getRemoteSocketAddress());
-
-                ClientSession session = new ClientSession(client, state, router);
-
-                // Part 3: thread-per-connection
-                // new Thread(session).start();
-
-                // Part 5: thread pool
-                if (pool != null) {
-                    pool.submit(session);
-                } else {
-                    new Thread(session).start();
-                }
-            }
+            ClientSession session = new ClientSession(client, state);
+            session.run();
         } catch (IOException e) {
-            System.err.println("Server error: " + e.getMessage());
-        } finally {
-            if (pool != null) pool.shutdownNow();
+            e.printStackTrace();
         }
-    }
+
+        }
+
+
+
 }

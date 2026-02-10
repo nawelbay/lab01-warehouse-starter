@@ -31,7 +31,6 @@ public class WarehouseClient {
                 out.write(line);
                 out.write("\n");
                 out.flush();
-
                 String resp = in.readLine();
                 if (resp == null) break;
                 System.out.println(resp);
