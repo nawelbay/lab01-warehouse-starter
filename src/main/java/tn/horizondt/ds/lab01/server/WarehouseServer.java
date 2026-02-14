@@ -8,15 +8,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * Warehouse Gateway TCP server.
- *
- * Parts:
- * - Part 1: single-client PING/PONG
- * - Part 3: accept loop + per-connection session
- * - Part 5: thread pool
- * - Part 6: graceful shutdown
- */
 public class WarehouseServer {
 
     public static void main(String[] args) {
@@ -36,17 +27,6 @@ public class WarehouseServer {
         OrderService orderService = new OrderService(new HashMap<>());
         ServerState state = new ServerState(inventoryService, orderService);
 
-
-
-        // TODO (Part 5): Replace thread-per-connection with a fixed thread pool.
-        // Example:
-        // ExecutorService pool = Executors.newFixedThreadPool(32);
-        ExecutorService pool = null;
-
-        // TODO (Part 6): Add graceful shutdown:
-        // - close server socket
-        // - shutdown thread pool
-        // - stop accept loop
         try {
         ServerSocket serverSocket =new ServerSocket(port);
             System.out.println("WarehouseServer listening on port " + port);
@@ -54,7 +34,7 @@ public class WarehouseServer {
             System.out.println("Client connected: " + client.getRemoteSocketAddress());
 
             ClientSession session = new ClientSession(client, state);
-            session.run();
+            new Thread(session).start();
         } catch (IOException e) {
             e.printStackTrace();
         }
