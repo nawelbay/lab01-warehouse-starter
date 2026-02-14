@@ -49,15 +49,17 @@ public class CommandRouter {
                 //if (stock < 0)
                // else
             }
-
-
-
-        } catch (Exception e) {
+} catch (Exception e) {
             // Never crash server on bad input.
             return Protocol.err(Protocol.INTERNAL, "server error");
         }
         return cmd;
     }
-
-
+protected static String formatInventory(Map<String, Integer> inv) {
+        return inv.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(e -> e.getKey() + "=" + e.getValue())
+                .collect(Collectors.joining(","));
+    }
 }
