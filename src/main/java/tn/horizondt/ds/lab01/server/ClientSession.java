@@ -5,12 +5,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 
-/**
- * Handles one TCP connection.
- *
- * TODO (Part 3): This should run concurrently for many clients (thread-per-connection initially).
- * TODO (Part 5): Later, run this via a thread pool (ExecutorService).
- */
+
 public class ClientSession implements Runnable {
 
     private final Socket socket;
